@@ -8,20 +8,22 @@
 
 <script type="text/javascript">
 <!--
-   function handleSubmit(){
-      $('prayertimes').innerHTML = 'please wait...';
-      actuallySubmit();
+   function clearCalculating(){
+      $('calculating').innerHTML = '';
    }
 
-   function actuallySubmit(){
+   function handleSubmit(){
+      $('calculating').innerHTML = 'please wait...';
       var input = document.ptform.location.value;
       if (input.length==0){
-         $('prayertimes').innerHTML = '';
+         $('calculating').innerHTML = '';
          return false;
       }
 
       new ajax('calculate.php?q=' + input,
-         { update: $('prayertimes'), method: 'get' });
+         { update: $('prayertimes'), 
+           method: 'get', 
+           onComplete: clearCalculating });
    }
 
    function manualLocation(loc){
@@ -45,6 +47,7 @@
          onsubmit="javascript:handleSubmit();">
       <input type="text" id="location">
    </form>
+   <div id="calculating"></div>
    <div id="prayertimes"></div>
 </div>
 </center>
