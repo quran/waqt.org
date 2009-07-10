@@ -1,0 +1,22 @@
+# In the name of Allah, Most Gracious, Most Merciful
+                   __ 
+ _    _____ ____ _/ /_
+| |/|/ / _ `/ _ `/ __/
+|__,__/\_,_/\_, /\__/ 
+             /_/  a muslim prayertimes calculator (http://waqt.org) 
+
+this is the sourcecode to waqt.org, a muslim prayertimes calculation website.  it relies on open source tools and apis to do it's calculations.
+
+dependencies:
+- itl php extension - http://svn.arabeyes.org/viewvc/projects/itl/ports/php/
+- yahoo geocoding api - http://developer.yahoo.com/maps/rest/V1/geocode.html
+- geonames api - http://www.geonames.org/
+
+requirements:
+- setup and install libitl, which can be found at arabeyes.org or on sourceforge https://sourceforge.net/projects/arabeyes/files/ITL itools/.
+- setup and install the php extension (phpize, configure, make, make install).
+- make a settings.inc file.  the contents of this file should be:
+  <?php
+  $appid = '';  // put your yahoo app id here
+
+i am providing this code to help those muslims who want to put prayertimes on their websites.  the source code is currently not very clean because it was quickly hacked together from an older version of the code that didn't rely on apis.  the hope is that i will clean it up as i get some time insha'Allah :)

@@ -1,0 +1,10 @@
+body { font:12px/1.45 "Lucida Sans Unicode",
+       "Lucida Grande",Arial,sans-serif }
+body a:visited { color: blue; }    
+.times-header { font-weight: bold; }
+.times-header img { border: 0px; }
+.salat-name { font-weight: bold; color: #4682B4; }
+.salat-time { font-style: italic; }
+.search-header { font-weight: bold; }
+.search-result { }
+.toplinks { text-align: right; }
