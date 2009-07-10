@@ -44,7 +44,7 @@ $dst = ($gmt_offset != $dst_offset);
  || 6 || Umm Al-Qurra (Saudi Arabia ||
  || 7 || Fixed Isha Interval (always 90) ||
  */
-$method = 4;
+$method = 4;  // todo: make this an option
 $prayers = itl_get_prayer_times($long, $lat, $gmt_offset, $method,
                                 date('j'), date('n'), date('Y'), $dst);
 

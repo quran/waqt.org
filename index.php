@@ -9,8 +9,17 @@
 <script type="text/javascript">
 <!--
    function handleSubmit(){
+      $('prayertimes').innerHTML = 'please wait...';
+      actuallySubmit();
+   }
+
+   function actuallySubmit(){
       var input = document.ptform.location.value;
-      if (input.length==0) return false;
+      if (input.length==0){
+         $('prayertimes').innerHTML = '';
+         return false;
+      }
+
       new ajax('calculate.php?q=' + input,
          { update: $('prayertimes'), method: 'get' });
    }

@@ -13,7 +13,7 @@ dependencies:
 - geonames api - http://www.geonames.org/
 
 requirements:
-- setup and install libitl, which can be found at arabeyes.org or on sourceforge https://sourceforge.net/projects/arabeyes/files/ITL itools/.
+- setup and install libitl, which can be found at arabeyes.org or on sourceforge https://sourceforge.net/projects/arabeyes/files/ITL.
 - setup and install the php extension (phpize, configure, make, make install).
 - make a settings.inc file.  the contents of this file should be:
   <?php
