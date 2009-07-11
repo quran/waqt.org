@@ -5,7 +5,6 @@ $url = "http://local.yahooapis.com/MapsService/V1/geocode" .
 $q = urlencode($_GET['q']);
 $format = isset($_GET['rss'])? 1 : 0;
 
-$baseurl = "http://waqt.org";
 $url = $url . $q . "&output=php";
 
 if (strlen($q) == 0) return; 
@@ -67,7 +66,7 @@ function showSalatTimes($location, $pt){
    global $format;
    $result = array();
    $times = array(0 => "Fajr", 1 => "Shurooq", 2 => "Dhuhr",
-                  3 => "3asr", 4 => "Maghrib", 5 => "3isha");
+                  3 => "'Asr", 4 => "Maghrib", 5 => "'Isha");
    foreach ($times as $key => $val){
       $min = $pt[$key]['minute'];
       $hour = $pt[$key]['hour'];
@@ -89,12 +88,11 @@ function showSalatTimes($location, $pt){
 }
 
 function showHtmlSalatTimes($location, $data){
-   global $baseurl;
    $param = "q=$location";
 
    print <<<SALATHTML_HEADER
    <span class="times-header">Prayer times for: $location
-   <a href="$baseurl/calculate.php?$param&rss">
+   <a href="calculate.php?$param&rss">
    <img src="imgs/feedicon.png"></a>
    </span><br>
 SALATHTML_HEADER;
@@ -106,35 +104,33 @@ SALATHTML_HEADER;
 }
 
 function showRssSalatTimes($location, $data){
-   global $baseurl;
    header("Content-Type: text/xml");
    print <<<RSSHEADER
 <?xml version="1.0" encoding="utf-8"?>
-   <rss version="2.0"
-        xmlns:content="http://purl.org/rss/1.0/modules/content/"
-        xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-        xmlns:dc="http://purl.org/dc/elements/1.1/"
-   >
+   <rss version="2.0">
    <channel>
       <title>PrayerTimes for $location</title>
-      <link>$baseurl</link>
+      <link>http://waqt.org</link>
       <description>prayertime feeds for the whole world, provided
                    by waqt.org</description>
-      <language>en-us</language>
+
 RSSHEADER;
 
    $i=0;
+   $pubdate = date('r');
    foreach ($data as $val => $time){
       $i++;
       print <<<RSSDATA
       <item>
-      <guid isPermaLink="false">$baseurl/$i</guid>
-      <title>$val</title>
-      <description>$time</description>
+         <title>$val - $time</title>
+         <description>$val is at $time.</description>
+         <link>http://waqt.org</link>
+         <pubDate>$pubdate</pubDate>
       </item>
+
 RSSDATA;
    }
-   print "</channel></rss>";
+   print "</channel>\n</rss>";
 }
 
 function showSearchResults($results){
