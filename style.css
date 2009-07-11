@@ -8,3 +8,5 @@ body a:visited { color: blue; }
 .search-header { font-weight: bold; }
 .search-result { }
 .toplinks { text-align: right; }
+.searchdesc { font-size: 80%; color: #565656; font-family: verdana;
+              margin-top: 5px; margin-bottom: 10px; }

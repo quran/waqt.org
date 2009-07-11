@@ -46,6 +46,7 @@
    <form name="ptform" action="javascript:void(0);"
          onsubmit="javascript:handleSubmit();">
       <input type="text" id="location">
+      <div class="searchdesc">to get prayertimes, type in a zipcode, postal code, city, city and state, country, or address.</div>
    </form>
    <div id="calculating"></div>
    <div id="prayertimes"></div>
