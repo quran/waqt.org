@@ -1,55 +1,52 @@
-<head>
-<title>waqt.org - muslim prayertimes</title>
+<?php
+// $ajax is set automagically from calculate.php for legacy purposes
+// $_GET['ajax'] should be set by the javascript in an ajax call.
+$ajax = isset($ajax)? true : (isset($_GET['ajax'])? true : false);
+$format = (isset($_GET['rss'])? 'rss' : 'html');
 
-<script type="text/javascript" src="prototype.lite.js"></script>
-<script type="text/javascript" src="moo.ajax.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css"> 
-</head>
+$q = "";
+$data = null;
+if (isset($_GET['q'])){
+   include 'prayertimes.inc';
+   $q = urlencode($_GET['q']);
+   if (strlen($q) > 0)
+      $data = PrayerTimes::getPrayerTimes($q);
+}
 
-<script type="text/javascript">
-<!--
-   function clearCalculating(){
-      $('calculating').innerHTML = '';
+if (!is_null($data)){
+   if ($data['type']=='search_results'){
+      $search_results = $data['data'];
+      if ($ajax) include 'views/locsearch.inc';
+      else include 'views/main.inc';
    }
+   else showSalatTimes($data['location'], $data['data'], $format, $ajax);
+   return;
+}
+else if ($ajax) return;
+else include 'views/main.inc';
 
-   function handleSubmit(){
-      $('calculating').innerHTML = 'please wait...';
-      var input = document.ptform.location.value;
-      if (input.length==0){
-         $('calculating').innerHTML = '';
-         return false;
+function showSalatTimes($location, $pt, $format, $ajax = true){
+   global $q;  // don't like this, but...
+
+   $data = array();
+   $times = array(0 => "Fajr", 1 => "Shurooq", 2 => "Dhuhr",
+                  3 => "'Asr", 4 => "Maghrib", 5 => "'Isha");
+   foreach ($times as $key => $val){
+      $min = $pt[$key]['minute'];
+      $hour = $pt[$key]['hour'];
+      $time_of_day = 'am';
+      if ($hour >= 12) {
+         $time_of_day = 'pm';
+         if ($hour > 12) $hour -= 12;
       }
-
-      new ajax('calculate.php?q=' + input,
-         { update: $('prayertimes'), 
-           method: 'get', 
-           onComplete: clearCalculating });
+      
+      if ($min < 10) $min = "0$min";
+      $time = $hour . ":" . $min . " $time_of_day";
+      $data[$val] = $time;
    }
 
-   function manualLocation(loc){
-      document.ptform.location.value = loc;
-      handleSubmit();
-   }
-
--->
-</script>
-
-<body onload="javascript:$('location').focus();">
-
-<div class="toplinks">
-<a href="about.php">About</a> | <a href="http://github.com/ahmedre/waqt.org">Github</a> 
-</div>
-
-<center>
-<img src="imgs/waqt.png">
-<div id="all">
-   <form name="ptform" action="javascript:void(0);"
-         onsubmit="javascript:handleSubmit();">
-      <input type="text" id="location">
-      <div class="searchdesc">to get prayertimes, type in a zipcode, postal code, city, city and state, country, or address.</div>
-   </form>
-   <div id="calculating"></div>
-   <div id="prayertimes"></div>
-</div>
-</center>
-</body>
+   if ($format == 'rss')
+      include 'views/salatrss.inc';
+   else if (!$ajax) include 'views/main.inc';
+   else include 'views/salatimes.inc';
+}
