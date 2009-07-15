@@ -13,9 +13,11 @@ $q = "";
 $data = null;
 if (isset($_GET['q'])){
    include 'prayertimes.inc';
-   $q = urlencode($_GET['q']);
-   if (strlen($q) > 0)
+   $q = $_GET['q'];
+   if (strlen($q) > 0){
       $data = PrayerTimes::getPrayerTimes($q);
+      if ($data['type']=='error') $data = null;
+   }
 }
 
 if (!is_null($data)){

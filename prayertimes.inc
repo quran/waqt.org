@@ -30,22 +30,32 @@ class PrayerTimes {
    }
 
    public static function getPrayerTimes($q, $method = 4){
-      $locations = PrayerTimes::getLocations($q);
-      
-      if (isset($locations['ResultSet']['Result'][1])){
-         $locs = $locations['ResultSet']['Result'];
-         $vals = array();
-         foreach ($locs as $loc)
-            $vals[] = PrayerTimes::calc_addr($loc);
-         return array('type' => 'search_results', 'data' => $vals);
+      $pos = strpos($q, "loc:");
+      if ($pos!==false){
+         $q = substr($q, $pos+4);
+         if (empty($q)) return array('type' => 'error', 'data' => array());
+         
+         list($lat, $long) = split(',', $q);
+         $addr = "loc:$lat,$long";
       }
-     
-      $res = $locations['ResultSet']['Result'];
-      $lat = $res['Latitude'];
-      $long = $res['Longitude'];
-      $addr = PrayerTimes::calc_addr($res);
-      $tz_data = PrayerTimes::getTimezone($lat, $long);
+      else {
+         $locations = PrayerTimes::getLocations($q);
+      
+         if (isset($locations['ResultSet']['Result'][1])){
+            $locs = $locations['ResultSet']['Result'];
+            $vals = array();
+            foreach ($locs as $loc)
+               $vals[] = PrayerTimes::calc_addr($loc);
+            return array('type' => 'search_results', 'data' => $vals);
+         }
+        
+         $res = $locations['ResultSet']['Result'];
+         $lat = $res['Latitude'];
+         $long = $res['Longitude'];
+         $addr = PrayerTimes::calc_addr($res);
+      }
 
+      $tz_data = PrayerTimes::getTimezone($lat, $long);
       $gmt_offset = $tz_data['gmtOffset'];
       $dst_offset = $tz_data['dstOffset'];
       $dst = ($gmt_offset != $dst_offset);

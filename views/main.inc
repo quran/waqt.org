@@ -8,6 +8,21 @@
 
 <script type="text/javascript">
 <!--
+   function init(){
+      $('location').focus();
+      var input = document.ptform.location.value;
+      if (input.length==0){
+         if (navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(function(position) {
+               document.ptform.location.value = 
+                  "loc:" + position.coords.latitude + "," + 
+                  position.coords.longitude;
+               handleSubmit();
+            });
+         }
+      }
+   }
+
    function clearCalculating(){
       $('calculating').innerHTML = '';
    }
@@ -34,7 +49,7 @@
 -->
 </script>
 
-<body onload="javascript:$('location').focus();">
+<body onload="javascript:init();">
 
 <div class="toplinks">
 <a href="/about">About</a> | <a href="http://github.com/ahmedre/waqt.org">Github</a> 
