@@ -1,3 +1,4 @@
 RewriteEngine on
 RewriteBase /
 RewriteRule ^rss(.*) index.php?rss=1 [QSA]
+RewriteRule ^about(.*) index.php?about=1

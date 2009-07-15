@@ -37,7 +37,7 @@
 <body onload="javascript:$('location').focus();">
 
 <div class="toplinks">
-<a href="about.php">About</a> | <a href="http://github.com/ahmedre/waqt.org">Github</a> 
+<a href="/about">About</a> | <a href="http://github.com/ahmedre/waqt.org">Github</a> 
 </div>
 
 <center>

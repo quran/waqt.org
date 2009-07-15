@@ -19,4 +19,9 @@ requirements:
   <?php
   $appid = '';  // put your yahoo app id here
 
-i am providing this code to help those muslims who want to put prayertimes on their websites.  the source code is currently not very clean because it was quickly hacked together from an older version of the code that didn't rely on apis.  the hope is that i will clean it up as i get some time insha'Allah :)
+- for apache, you need to use the .htaccess file for cleaner links
+- for lighttpd, something like this under the host should work:
+  url.rewrite = ( "^/rss(.*)" => "/index.php$1&rss=1", 
+                  "^/about(.*)" => "/index.php?about=1" )
+
+i am providing this code to help those muslims who want to put prayertimes on their websites.

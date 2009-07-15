@@ -1,4 +1,9 @@
 <?php
+if (isset($_GET['about'])){
+   include 'views/about.inc';
+   return;
+}
+
 // $ajax is set automagically from calculate.php for legacy purposes
 // $_GET['ajax'] should be set by the javascript in an ajax call.
 $ajax = isset($ajax)? true : (isset($_GET['ajax'])? true : false);

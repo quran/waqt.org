@@ -1,5 +1,7 @@
 <?php
    header("Content-Type: text/xml");
+
+   $param = "q=$location";
    print <<<RSSHEADER
 <?xml version="1.0" encoding="utf-8"?>
    <rss version="2.0">
@@ -19,7 +21,7 @@ RSSHEADER;
       <item>
          <title>$val - $time</title>
          <description>$val is at $time.</description>
-         <link>http://waqt.org</link>
+         <link>http://waqt.org?$param&amp;time=$i</link>
          <pubDate>$pubdate</pubDate>
       </item>
 
