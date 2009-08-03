@@ -15,4 +15,15 @@ logo made using the <a href="http://creatr.cc/creatr">web2.0 logo creatr</a>.
 <hr>
 If you have any questions, comments, or suggestions, please feel free to email us at: <a href='ma&#105;l&#116;o&#58;mus%6C&#105;&#109;&#97;d&#109;i%6E&#64;gmail&#46;&#99;om'>&#109;&#117;&#115;&#108;&#105;madmin&#64;&#103;mail&#46;c&#111;m</a>
 </center>
+
+<?php include "settings.inc"; ?>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "ht
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("<?php echo $gaCode; ?>");
+pageTracker._trackPageview();
+} catch(err) {}</script>
 </body>

@@ -18,6 +18,7 @@ requirements:
 - make a settings.inc file.  the contents of this file should be:
   <?php
   $appid = '';  // put your yahoo app id here
+  $gaCode = ''; // put your google analytics code here
 
 - for apache, you need to use the .htaccess file for cleaner links
 - for lighttpd, something like this under the host should work:

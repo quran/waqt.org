@@ -72,4 +72,15 @@
    </div>
 </div>
 </center>
+
+<?php include "settings.inc"; ?>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "ht
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("<?php echo $gaCode; ?>");
+pageTracker._trackPageview();
+} catch(err) {}</script>
 </body>
