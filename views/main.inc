@@ -1,10 +1,17 @@
-<head>
-<title>waqt.org - muslim prayertimes</title>
-
+<?php include 'views/header.inc'; ?>
 <script type="text/javascript" src="prototype.lite.js"></script>
 <script type="text/javascript" src="moo.ajax.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css"> 
-</head>
+<form name="ptform" action="javascript:void(0);" onsubmit="javascript:handleSubmit();">
+	<input type="text" id="location" value="<?php echo $q; ?>">
+	<div class="searchdesc">to get prayertimes, type in a zipcode, postal code, city, city and state, country, or address.</div>
+</form>
+<div id="calculating"></div>
+<div id="prayertimes">
+<?php
+  if (!is_null($search_results)) include 'views/locsearch.inc';
+  else if (!is_null($data)) include 'views/salatimes.inc';
+?>
+</div>
 
 <script type="text/javascript">
 <!--
@@ -28,7 +35,8 @@
    }
 
    function handleSubmit(){
-      $('calculating').innerHTML = 'please wait...';
+      $('calculating').innerHTML = '<img src="/imgs/loading.gif">';
+      $('prayertimes').innerHTML = '';
       var input = document.ptform.location.value;
       if (input.length==0){
          $('calculating').innerHTML = '';
@@ -45,42 +53,8 @@
       document.ptform.location.value = loc;
       handleSubmit();
    }
-
+   
+	init();
 -->
 </script>
-
-<body onload="javascript:init();">
-
-<div class="toplinks">
-<a href="/about">About</a> | <a href="http://github.com/ahmedre/waqt.org">Github</a> 
-</div>
-
-<center>
-<img src="imgs/waqt.png">
-<div id="all">
-   <form name="ptform" action="javascript:void(0);"
-         onsubmit="javascript:handleSubmit();">
-      <input type="text" id="location" value="<?php echo $q; ?>">
-      <div class="searchdesc">to get prayertimes, type in a zipcode, postal code, city, city and state, country, or address.</div>
-   </form>
-   <div id="calculating"></div>
-   <div id="prayertimes">
-   <?php
-      if (!is_null($search_results)) include 'views/locsearch.inc';
-      else if (!is_null($data)) include 'views/salatimes.inc';
-   ?>
-   </div>
-</div>
-</center>
-
-<?php include "settings.inc"; ?>
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("<?php echo $gaCode; ?>");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-</body>
+<?php include 'views/footer.inc'; ?>

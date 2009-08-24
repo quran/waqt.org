@@ -1,12 +1,29 @@
-body { font:12px/1.45 "Lucida Sans Unicode",
-       "Lucida Grande",Arial,sans-serif }
-body a:visited { color: blue; }    
-.times-header { font-weight: bold; }
-.times-header img { border: 0px; }
-.salat-name { font-weight: bold; color: #4682B4; }
-.salat-time { font-style: italic; }
-.search-header { font-weight: bold; }
-.search-result { }
+body { 
+		font:12px/1.45 "Lucida Sans Unicode","Lucida Grande",Arial,sans-serif;
+		margin: 0px;
+		height: 100%;
+}
+
+a 				{ color: #369; outline: none; }
+a:hover			{ color: #09F; }
+a img			{ border: 0; }
+
+#main			{ width: 550px; margin: 0 auto; padding-top: 20px; text-align: center;}
+#logo img 		{ display: block; margin: 0 auto;}
+.clear 			{ clear: both; }
+.times-header 	{ font-weight: bold; }
+
+#calculating 	{ position: absolute; width: 220px; left: 50%; margin: 15px 0 0 -110px; }
+#prayertimes	{ padding-top: 15px;}
+
+dl { width: 200px; margin: 0 auto; padding-top: 10px; }
+dt { width: 90px; margin: 0 10px 0 0; float: left; text-align: right; font-weight: bold; color: #4682B4; }
+dd { width: 90px; margin: 0 10px 0 0; float: left; text-align: left; }
+
 .toplinks { text-align: right; }
 .searchdesc { font-size: 80%; color: #565656; font-family: verdana;
               margin-top: 5px; margin-bottom: 10px; }
+
+#footer 		{ margin-top: 40px; color: #999; }
+#footer a		{ color: #666; text-decoration: none; margin: 0 5px;}
+#footer a:hover	{ color: #333; text-decoration: underline; }

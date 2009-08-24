@@ -57,3 +57,4 @@ function showSalatTimes($location, $pt, $format, $ajax = true){
    else if (!$ajax) include 'views/main.inc';
    else include 'views/salatimes.inc';
 }
+?>
