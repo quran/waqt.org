@@ -16,7 +16,10 @@ if (isset($_GET['q'])){
    $q = $_GET['q'];
    if (strlen($q) > 0){
       $data = PrayerTimes::getPrayerTimes($q);
-      if ($data['type']=='error') $data = null;
+      if ($data['type']=='error'){
+         print $data['msg'];
+         $data = null;
+      }
    }
 }
 

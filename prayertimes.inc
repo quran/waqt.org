@@ -25,15 +25,19 @@ class PrayerTimes {
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       $res = curl_exec($ch);
+
+      $info = curl_getinfo($ch);
+      $ret = $info['http_code'];
       curl_close($ch);
-      return json_decode($res, true);
+      return array('rescode' => $ret, 'result' => json_decode($res, true));
    }
 
    public static function getPrayerTimes($q, $method = 4){
       $pos = strpos($q, "loc:");
       if ($pos!==false){
          $q = substr($q, $pos+4);
-         if (empty($q)) return array('type' => 'error', 'data' => array());
+         if (empty($q)) return array('type' => 'error', 
+            'err' => 'invalid query string', 'data' => array());
          
          list($lat, $long) = split(',', $q);
          $addr = "loc:$lat,$long";
@@ -55,7 +59,15 @@ class PrayerTimes {
          $addr = PrayerTimes::calc_addr($res);
       }
 
-      $tz_data = PrayerTimes::getTimezone($lat, $long);
+      $tz_arr = PrayerTimes::getTimezone($lat, $long);
+      if ($tz_arr['rescode']!=200){
+         $errmsg = 'the geonames api which we depend on is ' .
+           'currently broken, please try again later.';
+         return array('type' => 'error',
+            'msg' => $errmsg,  'data' => array());
+      }
+
+      $tz_data = $tz_arr['result'];
       $gmt_offset = $tz_data['gmtOffset'];
       $dst_offset = $tz_data['dstOffset'];
       $dst = ($gmt_offset != $dst_offset);
