@@ -69,7 +69,22 @@ class PrayerTimes {
 
       $tz_data = $tz_arr['result'];
       $gmt_offset = $tz_data['gmtOffset'];
-      $dst_offset = $tz_data['dstOffset'];
+      $timezone_id = $tz_data['timezoneId'];
+
+      // unfortunately, the dstOffset returned by geonames
+      // is not necessarily accurate (ex with Egypt).  so
+      // have to keep update zoneinfo packages and compare
+      // to whatever php says.
+      try {
+         $tz = new DateTimeZone($timezone_id);
+         $date = new DateTime();
+         $date->setTimezone($tz);
+         $dst_offset = $date->getOffset()/3600;
+      }
+      catch (Exception $e){
+         $dst_offset = $tz_data['dstOffset'];
+      }
+
       $dst = ($gmt_offset != $dst_offset);
       
       /* methods
