@@ -3,6 +3,7 @@
 <script type="text/javascript" src="moo.ajax.js"></script>
 <form name="ptform" action="javascript:void(0);" onsubmit="javascript:handleSubmit();">
 	<input type="text" id="location" value="<?php echo $q; ?>">
+	<input type="submit" value="Search">
 	<div class="searchdesc">to get prayertimes, type in a zipcode, postal code, city, city and state, country, or address.</div>
 </form>
 <div id="calculating"></div>

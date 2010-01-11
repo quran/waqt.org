@@ -44,6 +44,12 @@ class PrayerTimes {
       }
       else {
          $locations = PrayerTimes::getLocations($q);
+         if ($locations == false){
+            $errmsg = 'one of the apis which we depend on is ' .
+              'currently broken, please try again later.';
+            return array('type' => 'error',
+               'msg' => $errmsg,  'data' => array());
+         }
       
          if (isset($locations['ResultSet']['Result'][1])){
             $locs = $locations['ResultSet']['Result'];
