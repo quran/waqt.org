@@ -20,7 +20,10 @@ class PrayerTimes {
    }
 
    public static function getTimezone($lat, $long){
-      $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
+      // geonames' json api is currently broken - switching to xml api
+      // $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
+
+      $url = "http://ws.geonames.org/timezone?lat=$lat&lng=$long";
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -29,7 +32,18 @@ class PrayerTimes {
       $info = curl_getinfo($ch);
       $ret = $info['http_code'];
       curl_close($ch);
-      return array('rescode' => $ret, 'result' => json_decode($res, true));
+
+      // specifically for xml interface
+      $result = array();
+      if (preg_match('/\<timezoneId>(.*)<\/timezoneId>/', $res, $matches))
+         $result['timezoneId'] = $matches[1];
+      if (preg_match('/\<gmtOffset>(.*)<\/gmtOffset>/', $res, $matches))
+         $result['gmtOffset'] = $matches[1];
+      if (preg_match('/\<dstOffset>(.*)</dstOffset>/', $res, $matches))
+         $result['dstOffset'] = $matches[1];
+
+      // return array('rescode' => $ret, 'result' => json_decode($res, true));
+      return array('rescode' => $ret, 'result' => $result);
    }
 
    public static function getPrayerTimes($q, $method = 4){
