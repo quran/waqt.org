@@ -1,15 +1,16 @@
 <?php
 
+include_once 'settings.inc';
+
 class PrayerTimes {
+
    public static function getLocations($q){
-      include 'settings.inc';  // todo: make these defines and use them
       $url = "http://local.yahooapis.com/MapsService/V1/geocode" .
-             "?appid=$appid&location=";
+             "?appid=" . YAHOO_APPID . "&location=";
       $q = urlencode($_GET['q']);
       $format = isset($_GET['rss'])? 1 : 0;
 
       $url = $url . $q . "&output=php";
-
       if (strlen($q) == 0) return; 
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $url);
@@ -20,10 +21,12 @@ class PrayerTimes {
    }
 
    public static function getTimezone($lat, $long){
-      // geonames' json api is currently broken - switching to xml api
-      // $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
+      $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
 
-      $url = "http://ws.geonames.org/timezone?lat=$lat&lng=$long";
+      // xml interface
+      // $url = "http://ws.geonames.org/timezone?lat=$lat&lng=$long";
+
+      $url .= "&username=" . USERNAME;
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -33,7 +36,7 @@ class PrayerTimes {
       $ret = $info['http_code'];
       curl_close($ch);
 
-      // specifically for xml interface
+      /* specifically for xml interface
       $result = array();
       if (preg_match('/\<timezoneId>(.*)<\/timezoneId>/', $res, $matches))
          $result['timezoneId'] = $matches[1];
@@ -42,8 +45,8 @@ class PrayerTimes {
       if (preg_match('/\<dstOffset>(.*)</dstOffset>/', $res, $matches))
          $result['dstOffset'] = $matches[1];
 
-      // return array('rescode' => $ret, 'result' => json_decode($res, true));
-      return array('rescode' => $ret, 'result' => $result);
+      return array('rescode' => $ret, 'result' => $result); */
+      return array('rescode' => $ret, 'result' => json_decode($res, true));
    }
 
    public static function getPrayerTimes($q, $method = 4){
@@ -86,27 +89,56 @@ class PrayerTimes {
          return array('type' => 'error',
             'msg' => $errmsg,  'data' => array());
       }
-
+      
       $tz_data = $tz_arr['result'];
-      $gmt_offset = $tz_data['gmtOffset'];
       $timezone_id = $tz_data['timezoneId'];
-
-      // unfortunately, the dstOffset returned by geonames
-      // is not necessarily accurate (ex with Egypt).  so
-      // have to keep update zoneinfo packages and compare
-      // to whatever php says.
+      
+      // unfortunately, the time offsets returned by geonames
+      // are not necessarily accurate (ex dst with Egypt, gmt
+      // with Sydney).  we consequently ignore geonames' offsets
+      // and figure out the current offset and whether or not we
+      // are in dst, since that's all we need.  all this means is
+      // that we have to keep the zoneinfo package on the system
+      // updated.
       try {
          $tz = new DateTimeZone($timezone_id);
          $date = new DateTime();
          $date->setTimezone($tz);
-         $dst_offset = $date->getOffset()/3600;
+         $cur_offset = $date->getOffset()/3600;
+         
+         $i = 1;
+         $now = time();
+         $transitions = $tz->getTransitions();
+         $max = count($transitions);
+         while (true){
+            // i make no guarantees about this code after october 2037.
+            // if it gets to that point, fallback to geonames.
+            if ($i >= $max) throw new Exception('date exception');
+            if (!isset($transitions[$i+1]))
+               throw new Exception('date exception');
+
+            if (($now >= $transitions[$i]['ts']) &&
+                ($now < $transitions[$i+1]['ts'])){
+               $dst = $transitions[$i]['isdst'];
+               $gmt_offset = $cur_offset - ($dst? 1 : 0);
+               break;
+            }
+            else $i++;
+         }
       }
       catch (Exception $e){
-         $dst_offset = $tz_data['dstOffset'];
-      }
+         $cur_offset = $tz_data['dstOffset'];
+         $gmt_offset = $tz_data['gmtOffset'];
+         $dst = ($gmt_offset != $cur_offset);
 
-      $dst = ($gmt_offset != $dst_offset);
+         if ($dst && (($gmt_offset + 1) != $cur_offset)){
+            // handle reverse dst case
+            $dst = false;
+            $gmt_offset = $cur_offset;
+         }
+      }
       
+      $method = $method + 0;
       /* methods
        || 1 || Egyptian General Authority of Survey ||
        || 2 || University of Islamic Sciences, Karachi (Shaf'i) ||
@@ -116,7 +148,6 @@ class PrayerTimes {
        || 6 || Umm Al-Qurra (Saudi Arabia ||
        || 7 || Fixed Isha Interval (always 90) ||
        */
-      $method = 4;  // todo: make method and dates options
       $prayers = itl_get_prayer_times($long, $lat, $gmt_offset, $method,
                                       date('j'), date('n'), date('Y'), $dst);
       return array('type' => 'prayertimes', 

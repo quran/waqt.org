@@ -9,7 +9,8 @@
 <div id="calculating"></div>
 <div id="prayertimes">
 <?php
-  if (!is_null($search_results)) include 'views/locsearch.inc';
+if ((isset($search_results)) && (!is_null($search_results)))
+   include 'views/locsearch.inc';
   else if (!is_null($data)) include 'views/salatimes.inc';
 ?>
 </div>

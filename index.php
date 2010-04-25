@@ -15,7 +15,13 @@ if (isset($_GET['q'])){
    include 'prayertimes.inc';
    $q = $_GET['q'];
    if (strlen($q) > 0){
-      $data = PrayerTimes::getPrayerTimes($q);
+      $method = 4;
+      if (isset($_GET['method'])){
+         $meth = $_GET['method'];
+         if ((is_numeric($meth)) && ($meth > 0) && ($meth < 8))
+            $method = $meth;
+      }
+      $data = PrayerTimes::getPrayerTimes($q, $method);
       if ($data['type']=='error'){
          print $data['msg'];
          $data = null;

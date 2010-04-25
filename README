@@ -20,6 +20,16 @@ requirements:
   $appid = '';  // put your yahoo app id here
   $gaCode = ''; // put your google analytics code here
 
+  define('GA_CODE', $gaCode);
+  define('YAHOO_APPID', $appid);
+  define('USERNAME', 'geonames_username');
+
+  * note - the username parameter was added to geonames to prevent abuse
+    of their webservice.  you can make one for free on the geonames site,
+    or comment out the json part of prayertimes.inc and uncomment the xml
+    part.  for more information, please see:
+    http://geonames.wordpress.com/2010/03/16/ddos-part-ii/
+
 - for apache, you need to use the .htaccess file for cleaner links
 - for lighttpd, something like this under the host should work:
   url.rewrite = ( "^/rss(.*)" => "/index.php$1&rss=1", 
