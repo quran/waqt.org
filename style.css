@@ -27,3 +27,40 @@ dd { width: 90px; margin: 0 10px 0 0; float: left; text-align: left; }
 #footer 		{ margin-top: 40px; color: #999; }
 #footer a		{ color: #666; text-decoration: none; margin: 0 5px;}
 #footer a:hover	{ color: #333; text-decoration: underline; }
+
+#toolbar {
+        height: 18px;
+        font-size: 12px;
+        font-family: Arial;
+        padding-top: 2px;
+        width: 100%;
+        line-height: normal;
+        border-bottom: 1px #c9d7f1 solid;
+}
+
+#toolbarLeft {
+        float: left;
+        padding-left: 8px;
+}
+#toolbarRight {
+        color: #999;
+        float: right;
+        padding-right: 8px;
+}
+
+#toolbarRight a {
+        text-decoration: none;
+        padding:0 3px;
+        color: #369;
+}
+
+#toolbarRight a:hover {
+        text-decoration: underline;
+        color: #09f;
+}
+
+#toolbarRight span {
+        color: #000;
+        font-weight: bold;
+        padding: 0 3px;
+}

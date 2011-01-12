@@ -2,14 +2,14 @@
    header("Content-Type: text/xml");
 
    $param = "q=$location";
+   //<pubDate>$pubdate</pubDate>
    print <<<RSSHEADER
 <?xml version="1.0" encoding="utf-8"?>
    <rss version="2.0">
    <channel>
       <title>PrayerTimes for $location</title>
       <link>http://waqt.org</link>
-      <description>prayertime feeds for the whole world, provided
-                   by waqt.org</description>
+      <description>provided by waqt.org</description>
 
 RSSHEADER;
 
@@ -19,10 +19,9 @@ RSSHEADER;
       $i++;
       print <<<RSSDATA
       <item>
-         <title>$val - $time</title>
-         <description>$val is at $time.</description>
+         <title>$val</title>
+         <description>$time</description>
          <link>http://waqt.org?$param&amp;time=$i</link>
-         <pubDate>$pubdate</pubDate>
       </item>
 
 RSSDATA;
