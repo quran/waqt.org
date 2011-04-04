@@ -7,7 +7,8 @@ if (isset($_GET['about'])){
 // $ajax is set automagically from calculate.php for legacy purposes
 // $_GET['ajax'] should be set by the javascript in an ajax call.
 $ajax = isset($ajax)? true : (isset($_GET['ajax'])? true : false);
-$format = (isset($_GET['rss'])? 'rss' : 'html');
+$format = (isset($_GET['rss'])? 'rss' : 
+   (isset($_GET['json'])? 'json' : 'html'));
 
 $q = "";
 $data = null;
@@ -63,6 +64,8 @@ function showSalatTimes($location, $pt, $format, $ajax = true){
 
    if ($format == 'rss')
       include 'views/salatrss.inc';
+   else if ($format == 'json')
+      include 'views/salatjson.inc';
    else if (!$ajax) include 'views/main.inc';
    else include 'views/salatimes.inc';
 }
