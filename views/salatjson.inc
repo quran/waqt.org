@@ -10,5 +10,6 @@
       $times[$val] = $time;
    }
 
-   $res[$location] = $times;
+   $res['query'] = $location;
+   $res['times'] = $times;
    print json_encode($res);
