@@ -113,9 +113,14 @@ class PrayerTimes {
          while (true){
             // i make no guarantees about this code after october 2037.
             // if it gets to that point, fallback to geonames.
-            if ($i >= $max) throw new Exception('date exception');
-            if (!isset($transitions[$i+1]))
-               throw new Exception('date exception');
+
+            // means we reach the end with no applicable switch rule.
+            // in this case, use the cur offset and assume no dst. 
+            if (!isset($transitions[$i+1])){
+               $dst = 0;
+               $gmt_offset = $cur_offset;
+               break;
+            }
 
             if (($now >= $transitions[$i]['ts']) &&
                 ($now < $transitions[$i+1]['ts'])){
