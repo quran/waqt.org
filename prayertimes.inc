@@ -21,7 +21,7 @@ class PrayerTimes {
    }
 
    public static function getTimezoneInfoFromCache($geohash){
-      mysql_pconnect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
       mysql_select_db('waqt');
 
       $q = 'select dst_offset, gmt_offset, timezone from ' .
@@ -36,6 +36,7 @@ class PrayerTimes {
          $ret['timezoneId'] = $row['timezone'];
       }
 
+      mysql_close();
       if ($ret != null)
          return array('rescode' => 200, 'result' => $ret);
       return $ret;
@@ -49,11 +50,14 @@ class PrayerTimes {
       $dstOffset = $json['dstOffset'];
       $gmtOffset = $json['gmtOffset'];
 
+      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysql_select_db('waqt');
       $q = 'insert into timezoneCache(geohash, latitude, longitude, ' .
          'timezone, raw_offset, dst_offset, gmt_offset) values(' .
          "'$geohash', $lat, $lng, '$tz', $rawOffset, $dstOffset, " .
          "$gmtOffset)";
       mysql_query($q);
+      mysql_close();
    }
 
    public static function getTimezone($lat, $long){
