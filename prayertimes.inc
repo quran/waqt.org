@@ -20,11 +20,49 @@ class PrayerTimes {
       return unserialize($res);
    }
 
-   public static function getTimezone($lat, $long){
-      $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
+   public static function getTimezoneInfoFromCache($geohash){
+      mysql_pconnect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysql_select_db('waqt');
 
-      // xml interface
-      // $url = "http://ws.geonames.org/timezone?lat=$lat&lng=$long";
+      $q = 'select dst_offset, gmt_offset, timezone from ' .
+         "timezoneCache where geohash='$geohash'";
+      $res = mysql_query($q) or null;
+
+      $ret = null;
+      if (($res != null) & ($row = mysql_fetch_assoc($res))){
+         $ret = array();
+         $ret['dstOffset'] = $row['dst_offset'];
+         $ret['gmtOffset'] = $row['gmt_offset'];
+         $ret['timezoneId'] = $row['timezone'];
+      }
+
+      if ($ret != null)
+         return array('rescode' => 200, 'result' => $ret);
+      return $ret;
+   }
+
+   public static function saveTimezoneInfoToCache($geohash, $json){
+      $lat = $json['lat'];
+      $lng = $json['lng'];
+      $tz = mysql_real_escape_string($json['timezoneId']);
+      $rawOffset = $json['rawOffset'];
+      $dstOffset = $json['dstOffset'];
+      $gmtOffset = $json['gmtOffset'];
+
+      $q = 'insert into timezoneCache(geohash, latitude, longitude, ' .
+         'timezone, raw_offset, dst_offset, gmt_offset) values(' .
+         "'$geohash', $lat, $lng, '$tz', $rawOffset, $dstOffset, " .
+         "$gmtOffset)";
+      mysql_query($q);
+   }
+
+   public static function getTimezone($lat, $long){
+      require_once('geo.php');
+      $geohash = GeoHashUtils::geoHashize($lat, $long);
+      $ret = PrayerTimes::getTimezoneInfoFromCache($geohash);
+      if ($ret != null) return $ret;
+      
+      $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
 
       $url .= "&username=" . USERNAME;
       $ch = curl_init();
@@ -36,17 +74,9 @@ class PrayerTimes {
       $ret = $info['http_code'];
       curl_close($ch);
 
-      /* specifically for xml interface
-      $result = array();
-      if (preg_match('/\<timezoneId>(.*)<\/timezoneId>/', $res, $matches))
-         $result['timezoneId'] = $matches[1];
-      if (preg_match('/\<gmtOffset>(.*)<\/gmtOffset>/', $res, $matches))
-         $result['gmtOffset'] = $matches[1];
-      if (preg_match('/\<dstOffset>(.*)</dstOffset>/', $res, $matches))
-         $result['dstOffset'] = $matches[1];
-
-      return array('rescode' => $ret, 'result' => $result); */
-      return array('rescode' => $ret, 'result' => json_decode($res, true));
+      $json = json_decode($res, true);
+      PrayerTimes::saveTimezoneInfoToCache($geohash, $json);
+      return array('rescode' => $ret, 'result' => $json);
    }
 
    public static function getPrayerTimes($q, $method = 4){
