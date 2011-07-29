@@ -1,4 +1,5 @@
 <?php
+header('Content-type: text/html; charset=utf-8');
 if (isset($_GET['about'])){
    include 'views/about.inc';
    return;

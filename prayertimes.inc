@@ -79,6 +79,8 @@ class PrayerTimes {
       curl_close($ch);
 
       $json = json_decode($res, true);
+      if (!isset($json['lat']))
+         error_log("could not find json info for $lat $lng - $ret");
       PrayerTimes::saveTimezoneInfoToCache($geohash, $json);
       return array('rescode' => $ret, 'result' => $json);
    }
@@ -109,7 +111,12 @@ class PrayerTimes {
                $vals[] = PrayerTimes::calc_addr($loc);
             return array('type' => 'search_results', 'data' => $vals);
          }
-        
+
+         if (!isset($locations['ResultSet']['Result'])){
+            error_log("error getting rs for location: $q"); 
+            return array('type' => 'error',
+               'msg' => 'place not found.', 'data' => array());
+         }
          $res = $locations['ResultSet']['Result'];
          $lat = $res['Latitude'];
          $long = $res['Longitude'];
