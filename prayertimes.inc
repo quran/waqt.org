@@ -21,7 +21,7 @@ class PrayerTimes {
    }
 
    public static function getTimezoneInfoFromCache($geohash){
-      mysql_pconnect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
       mysql_select_db('waqt');
 
       $q = 'select dst_offset, gmt_offset, timezone from ' .
@@ -36,6 +36,7 @@ class PrayerTimes {
          $ret['timezoneId'] = $row['timezone'];
       }
 
+      mysql_close();
       if ($ret != null)
          return array('rescode' => 200, 'result' => $ret);
       return $ret;
@@ -49,11 +50,14 @@ class PrayerTimes {
       $dstOffset = $json['dstOffset'];
       $gmtOffset = $json['gmtOffset'];
 
+      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysql_select_db('waqt');
       $q = 'insert into timezoneCache(geohash, latitude, longitude, ' .
          'timezone, raw_offset, dst_offset, gmt_offset) values(' .
          "'$geohash', $lat, $lng, '$tz', $rawOffset, $dstOffset, " .
          "$gmtOffset)";
       mysql_query($q);
+      mysql_close();
    }
 
    public static function getTimezone($lat, $long){
@@ -75,6 +79,8 @@ class PrayerTimes {
       curl_close($ch);
 
       $json = json_decode($res, true);
+      if (!isset($json['lat']))
+         error_log("could not find json info for $lat $lng - $ret");
       PrayerTimes::saveTimezoneInfoToCache($geohash, $json);
       return array('rescode' => $ret, 'result' => $json);
    }
@@ -105,7 +111,12 @@ class PrayerTimes {
                $vals[] = PrayerTimes::calc_addr($loc);
             return array('type' => 'search_results', 'data' => $vals);
          }
-        
+
+         if (!isset($locations['ResultSet']['Result'])){
+            error_log("error getting rs for location: $q"); 
+            return array('type' => 'error',
+               'msg' => 'place not found.', 'data' => array());
+         }
          $res = $locations['ResultSet']['Result'];
          $lat = $res['Latitude'];
          $long = $res['Longitude'];
