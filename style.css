@@ -4,8 +4,8 @@ body {
 		height: 100%;
 }
 
-a 				{ color: #369; outline: none; }
-a:hover			{ color: #09F; }
+a 				{ color: #000000; outline: none; }
+a:hover			{ color: #1a6abb; }
 a img			{ border: 0; }
 
 #main			{ width: 550px; margin: 0 auto; padding-top: 20px; text-align: center;}
@@ -16,26 +16,33 @@ a img			{ border: 0; }
 #calculating 	{ position: absolute; width: 220px; left: 50%; margin: 15px 0 0 -110px; }
 #prayertimes	{ padding-top: 15px;}
 
+.changelink { font-size:12px;
+   font-family:Lucida Sans Unicode,Lucida Grande,Arial,sans-serif;
+   color:#4682B4; text-decoration:underline; cursor:pointer }
+#methodbox { display: none; }
+
 dl { width: 200px; margin: 0 auto; padding-top: 10px; }
 dt { width: 90px; margin: 0 10px 0 0; float: left; text-align: right; font-weight: bold; color: #4682B4; }
 dd { width: 90px; margin: 0 10px 0 0; float: left; text-align: left; }
 
 .toplinks { text-align: right; }
 .searchdesc { font-size: 80%; color: #565656; font-family: verdana;
-              margin-top: 5px; margin-bottom: 10px; }
+              margin-top: 15px; margin-bottom: 10px; }
 
-#footer 		{ margin-top: 40px; color: #999; }
-#footer a		{ color: #666; text-decoration: none; margin: 0 5px;}
-#footer a:hover	{ color: #333; text-decoration: underline; }
+#footer 		{ margin-top: 15px; color: #de6e0b; text-align:right; padding-right:25px }
+#footer a		{ color: #de6e0b; text-decoration: none; margin: 0 5px;}
+#footer a:hover	{ color:#4682B4; text-decoration: none; }
+#footer span    { color: #4682B4; text-decoration: none; }
 
 #toolbar {
-        height: 18px;
+        height: 12px;
         font-size: 12px;
         font-family: Arial;
-        padding-top: 2px;
+        padding: 12px 0;
         width: 100%;
         line-height: normal;
-        border-bottom: 1px #c9d7f1 solid;
+		color:#000000;
+		background-color:#f9d9a4;
 }
 
 #toolbarLeft {
@@ -43,7 +50,7 @@ dd { width: 90px; margin: 0 10px 0 0; float: left; text-align: left; }
         padding-left: 8px;
 }
 #toolbarRight {
-        color: #999;
+        color: #000000;
         float: right;
         padding-right: 8px;
 }
@@ -51,16 +58,33 @@ dd { width: 90px; margin: 0 10px 0 0; float: left; text-align: left; }
 #toolbarRight a {
         text-decoration: none;
         padding:0 3px;
-        color: #369;
+        color: #000000;
 }
 
 #toolbarRight a:hover {
-        text-decoration: underline;
-        color: #09f;
+        text-decoration: none;
+        color: #1a6abb;
 }
 
 #toolbarRight span {
-        color: #000;
+        color: #1a6abb;
         font-weight: bold;
         padding: 0 3px;
 }
+
+/*-- for redesign--*/
+.zipcode{
+	border:1px solid #e57818; 
+	padding:3.5px}
+	
+.search{
+	padding:3px 20px; 
+	background-color:#f9d9a4; 
+	border:1px solid #e57818;
+	cursor:pointer}
+
+.search:hover {
+	padding:3px 20px; 
+	background-color:#f09a11; 
+	border:1px solid #e57818;
+	cursor:pointer}

@@ -36,13 +36,14 @@ if (!is_null($data)){
       if ($ajax) include 'views/locsearch.inc';
       else include 'views/main.inc';
    }
-   else showSalatTimes($data['location'], $data['data'], $format, $ajax);
+   else showSalatTimes($data['location'], $data['data'], 
+                       $format, $method, $ajax);
    return;
 }
 else if ($ajax) return;
 else include 'views/main.inc';
 
-function showSalatTimes($location, $pt, $format, $ajax = true){
+function showSalatTimes($location, $pt, $format, $method, $ajax = true){
    global $q;  // don't like this, but...
 
    $data = array();
