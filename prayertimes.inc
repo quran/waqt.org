@@ -16,8 +16,49 @@ class PrayerTimes {
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       $res = curl_exec($ch);
+      $info = curl_getinfo($ch);
+      $ret = $info['http_code'];
       curl_close($ch);
-      return unserialize($res);
+
+      if ($ret == 403)
+         return PrayerTimes::getLocationsFromGoogle($q);
+      else return unserialize($res);
+   }
+
+   public static function getLocationsFromGoogle($q){
+      $url = "http://maps.googleapis.com/maps/api/geocode/json?" .
+         "sensor=false&address=";
+      $q = urlencode($_GET['q']);
+
+      $url = $url . $q;
+      if (strlen($q) == 0) return; 
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      $res = curl_exec($ch);
+      $info = curl_getinfo($ch);
+      $ret = $info['http_code'];
+      curl_close($ch);
+
+      $out = json_decode($res, true);
+      if ($out == null) return null;
+      $locations = array();
+      $locations['ResultSet'] = array();
+      $locations['ResultSet']['Result'] = array();
+      $gres = $out['results'];
+      foreach ($gres as $res){
+         $loc = $res['geometry']['location'];
+         $addr = $res['formatted_address'];
+         // lat, lng
+         $ret = array('Latitude' => $loc['lat'],
+            'Longitude' => $loc['lng'], 'addrstr' => $addr);
+         $locations['ResultSet']['Result'][] = $ret;
+      }
+
+      if (count($locations['ResultSet']['Result']) == 1)
+         $locations['ResultSet']['Result'] =
+            $locations['ResultSet']['Result'][0];
+      return $locations;
    }
 
    public static function getTimezoneInfoFromCache($geohash){
@@ -201,6 +242,9 @@ class PrayerTimes {
    }
    
    public static function calc_addr($res){
+      if (isset($res['addrstr']))
+         return $res['addrstr'];
+
       $city = $res['City'];
       $state = $res['State'];
       $zip = $res['Zip'];
