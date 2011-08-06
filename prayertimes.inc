@@ -4,6 +4,21 @@ include_once 'settings.inc';
 
 class PrayerTimes {
 
+   public static function getLocationFromCache($q){
+      $qs = "select * from geocodeCache where query='$q'";
+      $res = mysql_query($qs) or null;
+      
+      $ret = null;
+      if (($res != null) && ($row = mysql_fetch_assoc($res))){
+         $ret['ResultSet'] = array();
+         $ret['ResultSet']['Result'] =
+            array('Latitude' => $row['latitude'],
+                  'Longitude' => $row['longitude'],
+                  'addrstr' => $row['address']);
+      }
+      return $ret;
+   }
+
    public static function getLocations($q){
       $url = "http://local.yahooapis.com/MapsService/V1/geocode" .
              "?appid=" . YAHOO_APPID . "&location=";
@@ -58,13 +73,11 @@ class PrayerTimes {
       if (count($locations['ResultSet']['Result']) == 1)
          $locations['ResultSet']['Result'] =
             $locations['ResultSet']['Result'][0];
+      $locations['dataSource'] = 'google';
       return $locations;
    }
 
    public static function getTimezoneInfoFromCache($geohash){
-      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
-      mysql_select_db('waqt');
-
       $q = 'select dst_offset, gmt_offset, timezone from ' .
          "timezoneCache where geohash='$geohash'";
       $res = mysql_query($q) or null;
@@ -77,7 +90,6 @@ class PrayerTimes {
          $ret['timezoneId'] = $row['timezone'];
       }
 
-      mysql_close();
       if ($ret != null)
          return array('rescode' => 200, 'result' => $ret);
       return $ret;
@@ -91,14 +103,18 @@ class PrayerTimes {
       $dstOffset = $json['dstOffset'];
       $gmtOffset = $json['gmtOffset'];
 
-      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
-      mysql_select_db('waqt');
       $q = 'insert into timezoneCache(geohash, latitude, longitude, ' .
          'timezone, raw_offset, dst_offset, gmt_offset) values(' .
          "'$geohash', $lat, $lng, '$tz', $rawOffset, $dstOffset, " .
          "$gmtOffset)";
       mysql_query($q);
-      mysql_close();
+   }
+
+   public static function storeLocationInCache($q, $lat, $long, $addr, $src){
+      $addr = mysql_real_escape_string($addr);
+      $qs = 'insert into geocodeCache(query, latitude, longitude, ' .
+         "address, source) values('$q', $lat, $long, '$addr', $src)";
+      mysql_query($qs);
    }
 
    public static function getTimezone($lat, $long){
@@ -127,6 +143,11 @@ class PrayerTimes {
    }
 
    public static function getPrayerTimes($q, $method = 4){
+      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysql_select_db('waqt');
+      mysql_query("set names 'utf8'");
+      $q = mysql_real_escape_string($q);
+
       $pos = strpos($q, "loc:");
       if ($pos!==false){
          $q = substr($q, $pos+4);
@@ -137,44 +158,83 @@ class PrayerTimes {
          $addr = "loc:$lat,$long";
       }
       else {
-         $locations = PrayerTimes::getLocations($q);
-         if ($locations == false){
-            $errmsg = 'one of the apis which we depend on is ' .
-              'currently broken, please try again later.';
-            return array('type' => 'error',
-               'msg' => $errmsg,  'data' => array());
-         }
-      
-         if (isset($locations['ResultSet']['Result'][1])){
-            $locs = $locations['ResultSet']['Result'];
-            $vals = array();
-            foreach ($locs as $loc)
-               $vals[] = PrayerTimes::calc_addr($loc);
-            return array('type' => 'search_results', 'data' => $vals);
+         $stored = true;
+         $locations = PrayerTimes::getLocationFromCache($q);
+         if ($locations == null){
+            $stored = false;
+            $locations = PrayerTimes::getLocations($q);
+            if ($locations == false){
+               $errmsg = 'one of the apis which we depend on is ' .
+               'currently broken, please try again later.';
+               return array('type' => 'error',
+                  'msg' => $errmsg,  'data' => array());
+            }
+         
+            if (isset($locations['ResultSet']['Result'][1])){
+               $locs = $locations['ResultSet']['Result'];
+               $vals = array();
+               foreach ($locs as $loc)
+                  $vals[] = PrayerTimes::calc_addr($loc);
+               return array('type' => 'search_results', 'data' => $vals);
+            }
+
+            if (!isset($locations['ResultSet']['Result'])){
+               mysql_close();
+               error_log("error getting rs for location: $q"); 
+               return array('type' => 'error',
+                  'msg' => 'place not found.', 'data' => array());
+            }
          }
 
-         if (!isset($locations['ResultSet']['Result'])){
-            error_log("error getting rs for location: $q"); 
-            return array('type' => 'error',
-               'msg' => 'place not found.', 'data' => array());
-         }
          $res = $locations['ResultSet']['Result'];
          $lat = $res['Latitude'];
          $long = $res['Longitude'];
          $addr = PrayerTimes::calc_addr($res);
+
+         # 0 is yahoo, 1 is google
+         $src = isset($locations['dataSource'])? 1 : 0;
+
+         if (!$stored)
+            PrayerTimes::storeLocationInCache($q, $lat, $long, $addr, $src);
       }
 
       $tz_arr = PrayerTimes::getTimezone($lat, $long);
+
       if ($tz_arr['rescode']!=200){
+         mysql_close();
          $errmsg = 'the geonames api which we depend on is ' .
            'currently broken, please try again later.';
          return array('type' => 'error',
             'msg' => $errmsg,  'data' => array());
       }
-      
       $tz_data = $tz_arr['result'];
       $timezone_id = $tz_data['timezoneId'];
+      $res = PrayerTimes::calculateTimeOffsets($timezone_id, $tz_data);
+      $gmt_offset = $res['gmt_offset'];
+      $dst = $res['dst'];
       
+      $method = $method + 0;
+      /* methods
+       || 1 || Egyptian General Authority of Survey ||
+       || 2 || University of Islamic Sciences, Karachi (Shaf'i) ||
+       || 3 || University of Islamic Sciences, Karachi (Hanafi) ||
+       || 4 || Islamic Society of North America ||
+       || 5 || Muslim World League (MWL) ||
+       || 6 || Umm Al-Qurra (Saudi Arabia ||
+       || 7 || Fixed Isha Interval (always 90) ||
+       */
+      $prayers = itl_get_prayer_times($long, $lat, $gmt_offset, $method,
+                                      date('j'), date('n'), date('Y'), $dst);
+      mysql_close();
+      return array('type' => 'prayertimes', 
+         'data' => $prayers, 'location' => $addr);
+   }
+
+   public static function calculateTimeOffsets($timezone_id, $tz_data){
+      $dst = 0;
+      $cur_offset = 0;
+      $gmt_offset = 0;
+
       // unfortunately, the time offsets returned by geonames
       // are not necessarily accurate (ex dst with Egypt, gmt
       // with Sydney).  we consequently ignore geonames' offsets
@@ -224,21 +284,8 @@ class PrayerTimes {
             $gmt_offset = $cur_offset;
          }
       }
-      
-      $method = $method + 0;
-      /* methods
-       || 1 || Egyptian General Authority of Survey ||
-       || 2 || University of Islamic Sciences, Karachi (Shaf'i) ||
-       || 3 || University of Islamic Sciences, Karachi (Hanafi) ||
-       || 4 || Islamic Society of North America ||
-       || 5 || Muslim World League (MWL) ||
-       || 6 || Umm Al-Qurra (Saudi Arabia ||
-       || 7 || Fixed Isha Interval (always 90) ||
-       */
-      $prayers = itl_get_prayer_times($long, $lat, $gmt_offset, $method,
-                                      date('j'), date('n'), date('Y'), $dst);
-      return array('type' => 'prayertimes', 
-         'data' => $prayers, 'location' => $addr);
+
+      return array('gmt_offset' => $gmt_offset, 'dst' => $dst);
    }
    
    public static function calc_addr($res){
