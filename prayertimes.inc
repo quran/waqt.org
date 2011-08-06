@@ -136,9 +136,11 @@ class PrayerTimes {
       curl_close($ch);
 
       $json = json_decode($res, true);
-      if (!isset($json['lat']))
-         error_log("could not find json info for $lat $lng - $ret");
-      PrayerTimes::saveTimezoneInfoToCache($geohash, $json);
+      if (!isset($json['lat'])){
+         $str = print_r($json, true);
+         error_log("could not find json info for $lat $long - $ret : $str");
+      }
+      else PrayerTimes::saveTimezoneInfoToCache($geohash, $json);
       return array('rescode' => $ret, 'result' => $json);
    }
 
