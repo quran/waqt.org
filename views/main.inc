@@ -1,5 +1,5 @@
 <?php include 'views/header.inc'; ?>
-<script type="text/javascript" src="prototype.lite.js"></script>
+<script type="text/javascript" src="prototype_lite.js"></script>
 <script type="text/javascript" src="moo.ajax.js"></script>
 
 <form name="ptform" action="javascript:void(0);" onsubmit="javascript:handleSubmit();">
