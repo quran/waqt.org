@@ -20,24 +20,7 @@ class PrayerTimes {
    }
 
    public static function getLocations($q){
-      $url = "http://local.yahooapis.com/MapsService/V1/geocode" .
-             "?appid=" . YAHOO_APPID . "&location=";
-      $q = urlencode($_GET['q']);
-      $format = isset($_GET['rss'])? 1 : 0;
-
-      $url = $url . $q . "&output=php";
-      if (strlen($q) == 0) return; 
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $url);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-      $res = curl_exec($ch);
-      $info = curl_getinfo($ch);
-      $ret = $info['http_code'];
-      curl_close($ch);
-
-      if ($ret == 403)
-         return PrayerTimes::getLocationsFromGoogle($q);
-      else return unserialize($res);
+      return PrayerTimes::getLocationsFromGoogle($q);
    }
 
    public static function getLocationsFromGoogle($q){
@@ -123,7 +106,7 @@ class PrayerTimes {
       $ret = PrayerTimes::getTimezoneInfoFromCache($geohash);
       if ($ret != null) return $ret;
       
-      $url = "http://ws.geonames.org/timezoneJSON?lat=$lat&lng=$long";
+      $url = "http://ws.geonames.net/timezoneJSON?lat=$lat&lng=$long";
 
       $url .= "&username=" . USERNAME;
       $ch = curl_init();

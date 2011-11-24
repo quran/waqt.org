@@ -8,8 +8,8 @@
    <rss version="2.0">
    <channel>
       <title>PrayerTimes for $location</title>
-      <link>http://waqt.org</link>
-      <description>provided by waqt.org</description>
+      <link>http://salah.com</link>
+      <description>provided by salah.com</description>
 
 RSSHEADER;
 
@@ -21,7 +21,7 @@ RSSHEADER;
       <item>
          <title>$val</title>
          <description>$time</description>
-         <link>http://waqt.org?$param&amp;time=$i</link>
+         <link>http://salah.com?$param&amp;time=$i</link>
       </item>
 
 RSSDATA;

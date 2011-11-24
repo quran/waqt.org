@@ -8,7 +8,7 @@
 <meta name="Distribution" content="Global">
 <meta name="Rating" content="General">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Waqt.org - Muslim Prayer Times</title>
+<title>Salah.com - Muslim Prayer Times</title>
 </head>
 
 <body>
@@ -17,4 +17,4 @@
 <div style="height:1px; background-color:#ef9a10">&nbsp;</div>
 <?php include 'views/nav.inc'; ?>
 <div id="main">
-<div style="padding-top:10px;padding-bottom:40px"><a id="logo" href="/"><img src="imgs/waqt.jpg" border="0" ></a></div>
+<div style="padding-top:10px;padding-bottom:40px"><a id="logo" href="/"><img src="imgs/salah.jpg" border="0" ></a></div>
