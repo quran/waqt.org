@@ -27,9 +27,13 @@ class PrayerTimes {
       $url = "http://maps.googleapis.com/maps/api/geocode/json?" .
          "sensor=false&address=";
       $q = urlencode($_GET['q']);
+      if (strlen($q) == 0) return; 
 
       $url = $url . $q;
-      if (strlen($q) == 0) return; 
+      if (preg_match("/^\p{Arabic}/u", $_GET['q']) > 0) {
+         $url = $url . '&language=ar';
+      }
+
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
