@@ -32,9 +32,15 @@ if (isset($_GET['q'])){
 
 if (!is_null($data)){
    if ($data['type']=='search_results'){
-      $search_results = $data['data'];
-      if ($ajax) include 'views/locsearch.inc';
-      else include 'views/main.inc';
+      if ($format == 'html') {
+         $search_results = $data['data'];
+         if ($ajax) include 'views/locsearch.inc';
+         else include 'views/main.inc';
+      } else {
+         header("Content-Type: application/json");
+         print '{}';
+         return;
+      }
    }
    else showSalatTimes($data['location'], $data['data'], 
                        $format, $method, $ajax);
