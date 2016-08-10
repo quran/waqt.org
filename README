@@ -8,8 +8,9 @@
 this is the sourcecode to waqt.org, a muslim prayertimes calculation website.  it relies on open source tools and apis to do it's calculations.
 
 dependencies:
-- itl php extension - http://svn.arabeyes.org/viewvc/projects/itl/ports/php/
-- yahoo geocoding api - http://developer.yahoo.com/maps/rest/V1/geocode.html
+- itl php extension - https://github.com/arabeyes-org/ITL-ports
+  (note - for php7, you can use my [experimental fork](https://github.com/ahmedre/ITL-ports))
+- google geocoding api
 - geonames api - http://www.geonames.org/
 
 requirements:
@@ -21,7 +22,6 @@ requirements:
   $gaCode = ''; // put your google analytics code here
 
   define('GA_CODE', $gaCode);
-  define('YAHOO_APPID', $appid);
   define('USERNAME', 'geonames_username');
 
   * note - the username parameter was added to geonames to prevent abuse

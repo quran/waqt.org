@@ -4,12 +4,12 @@ include_once 'settings.inc';
 
 class PrayerTimes {
 
-   public static function getLocationFromCache($q){
+   public static function getLocationFromCache($link, $q){
       $qs = "select * from geocodeCache where query='$q'";
-      $res = mysql_query($qs) or null;
+      $res = mysqli_query($link, $qs) or null;
       
       $ret = null;
-      if (($res != null) && ($row = mysql_fetch_assoc($res))){
+      if (($res != null) && ($row = mysqli_fetch_assoc($res))){
          $ret['ResultSet'] = array();
          $ret['ResultSet']['Result'] =
             array('Latitude' => $row['latitude'],
@@ -64,13 +64,13 @@ class PrayerTimes {
       return $locations;
    }
 
-   public static function getTimezoneInfoFromCache($geohash){
+   public static function getTimezoneInfoFromCache($link, $geohash){
       $q = 'select dst_offset, gmt_offset, timezone from ' .
          "timezoneCache where geohash='$geohash'";
-      $res = mysql_query($q) or null;
+      $res = mysqli_query($link, $q) or null;
 
       $ret = null;
-      if (($res != null) & ($row = mysql_fetch_assoc($res))){
+      if (($res != null) & ($row = mysqli_fetch_assoc($res))){
          $ret = array();
          $ret['dstOffset'] = $row['dst_offset'];
          $ret['gmtOffset'] = $row['gmt_offset'];
@@ -82,10 +82,10 @@ class PrayerTimes {
       return $ret;
    }
 
-   public static function saveTimezoneInfoToCache($geohash, $json){
+   public static function saveTimezoneInfoToCache($link, $geohash, $json){
       $lat = $json['lat'];
       $lng = $json['lng'];
-      $tz = mysql_real_escape_string($json['timezoneId']);
+      $tz = mysqli_real_escape_string($link, $json['timezoneId']);
       $rawOffset = $json['rawOffset'];
       $dstOffset = $json['dstOffset'];
       $gmtOffset = $json['gmtOffset'];
@@ -94,20 +94,21 @@ class PrayerTimes {
          'timezone, raw_offset, dst_offset, gmt_offset) values(' .
          "'$geohash', $lat, $lng, '$tz', $rawOffset, $dstOffset, " .
          "$gmtOffset)";
-      mysql_query($q);
+      mysqli_query($link, $q);
    }
 
-   public static function storeLocationInCache($q, $lat, $long, $addr, $src){
-      $addr = mysql_real_escape_string($addr);
+   public static function storeLocationInCache($link, $q, $lat, $long,
+                                               $addr, $src){
+      $addr = mysqli_real_escape_string($link, $addr);
       $qs = 'insert into geocodeCache(query, latitude, longitude, ' .
          "address, source) values('$q', $lat, $long, '$addr', $src)";
-      mysql_query($qs);
+      mysqli_query($link, $qs);
    }
 
-   public static function getTimezone($lat, $long){
+   public static function getTimezone($link, $lat, $long){
       require_once('geo.php');
       $geohash = GeoHashUtils::geoHashize($lat, $long);
-      $ret = PrayerTimes::getTimezoneInfoFromCache($geohash);
+      $ret = PrayerTimes::getTimezoneInfoFromCache($link, $geohash);
       if ($ret != null) return $ret;
       
       $url = "http://ws.geonames.net/timezoneJSON?lat=$lat&lng=$long";
@@ -127,15 +128,15 @@ class PrayerTimes {
          $str = print_r($json, true);
          error_log("could not find json info for $lat $long - $ret : $str");
       }
-      else PrayerTimes::saveTimezoneInfoToCache($geohash, $json);
+      else PrayerTimes::saveTimezoneInfoToCache($link, $geohash, $json);
       return array('rescode' => $ret, 'result' => $json);
    }
 
    public static function getPrayerTimes($q, $method = 4){
-      mysql_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
-      mysql_select_db('waqt');
-      mysql_query("set names 'utf8'");
-      $q = mysql_real_escape_string($q);
+      $link = mysqli_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      mysqli_select_db($link, 'waqt');
+      mysqli_query($link, "set names 'utf8'");
+      $q = mysqli_real_escape_string($link, $q);
 
       $pos = strpos($q, "loc:");
       if ($pos!==false){
@@ -143,12 +144,12 @@ class PrayerTimes {
          if (empty($q)) return array('type' => 'error', 
             'err' => 'invalid query string', 'data' => array());
          
-         list($lat, $long) = split(',', $q);
+         list($lat, $long) = explode(',', $q);
          $addr = "loc:$lat,$long";
       }
       else {
          $stored = true;
-         $locations = PrayerTimes::getLocationFromCache($q);
+         $locations = PrayerTimes::getLocationFromCache($link, $q);
          if ($locations == null){
             $stored = false;
             $locations = PrayerTimes::getLocations($q);
@@ -168,7 +169,7 @@ class PrayerTimes {
             }
 
             if (!isset($locations['ResultSet']['Result'])){
-               mysql_close();
+               mysqli_close($link);
                error_log("error getting rs for location: $q"); 
                return array('type' => 'error',
                   'msg' => 'place not found.', 'data' => array());
@@ -184,13 +185,13 @@ class PrayerTimes {
          $src = isset($locations['dataSource'])? 1 : 0;
 
          if (!$stored)
-            PrayerTimes::storeLocationInCache($q, $lat, $long, $addr, $src);
+            PrayerTimes::storeLocationInCache($link, $q, $lat, $long, $addr, $src);
       }
 
-      $tz_arr = PrayerTimes::getTimezone($lat, $long);
+      $tz_arr = PrayerTimes::getTimezone($link, $lat, $long);
 
       if ($tz_arr['rescode']!=200){
-         mysql_close();
+         mysqli_close($link);
          $errmsg = 'the geonames api which we depend on is ' .
            'currently broken, please try again later.';
          return array('type' => 'error',
@@ -214,7 +215,7 @@ class PrayerTimes {
        */
       $prayers = itl_get_prayer_times($long, $lat, $gmt_offset, $method,
                                       date('j'), date('n'), date('Y'), $dst);
-      mysql_close();
+      mysqli_close($link);
       return array('type' => 'prayertimes', 
          'data' => $prayers, 'location' => $addr);
    }
