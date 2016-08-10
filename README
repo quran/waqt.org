@@ -9,7 +9,7 @@ this is the sourcecode to waqt.org, a muslim prayertimes calculation website.  i
 
 dependencies:
 - itl php extension - https://github.com/arabeyes-org/ITL-ports
-  (note - for php7, you can use my [experimental fork](https://github.com/ahmedre/ITL-ports))
+  (note - for php7, you can use my experimental fork - https://github.com/ahmedre/ITL-ports)
 - google geocoding api
 - geonames api - http://www.geonames.org/
 
@@ -17,8 +17,8 @@ requirements:
 - setup and install libitl, which can be found at arabeyes.org or on sourceforge https://sourceforge.net/projects/arabeyes/files/ITL.
 - setup and install the php extension (phpize, configure, make, make install).
 - make a settings.inc file.  the contents of this file should be:
+
   <?php
-  $appid = '';  // put your yahoo app id here
   $gaCode = ''; // put your google analytics code here
 
   define('GA_CODE', $gaCode);
