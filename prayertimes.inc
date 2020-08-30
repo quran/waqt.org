@@ -133,7 +133,7 @@ class PrayerTimes {
    }
 
    public static function getPrayerTimes($q, $method = 4){
-      $link = mysqli_connect('localhost', 'waqt', WAQT_SQL_PASSWORD);
+      $link = mysqli_connect('waqt-db', 'waqt', WAQT_SQL_PASSWORD);
       mysqli_select_db($link, 'waqt');
       mysqli_query($link, "set names 'utf8'");
       $q = mysqli_real_escape_string($link, $q);

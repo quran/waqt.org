@@ -10,21 +10,21 @@ function buildToolbar(){
       if ($cached != false) return $cached;
    }
 
-   $host = "localhost";
-   $username = "quran";
-   $password = "qutubi786";
-   $database = "quran";
+   $host = "waqt-db";
+   $username = "waqt";
+   $password = "qurtubi786";
+   $database = "waqt";
 
    $link = mysqli_connect($host, $username, $password);
    if (!$link) return;
-   if (!mysql_select_db($database)) return;
+   if (!mysqli_select_db($link, $database)) return;
 
-   $result = mysql_query($link, "SELECT * FROM quran.toolbar WHERE type='toolbar' AND active='1' ORDER BY weight");
+   $result = mysqli_query($link, "SELECT * FROM toolbar WHERE type='toolbar' AND active='1' ORDER BY weight");
    if (!$result) return;
 
    $i = 0;
    $string = '';
-   while ($toolbarItem = mysql_fetch_assoc($result)){
+   while ($toolbarItem = mysqli_fetch_assoc($link, $result)){
       $i++;
       $reps = array('http://');
       if (strpos($_SERVER['SERVER_NAME'], 'www.')===false)
@@ -40,7 +40,7 @@ function buildToolbar(){
           $string .= '>'.$toolbarItem['itemLabel'].'</a>';
       }
 
-      if ($i < mysql_num_rows($result))
+      if ($i < mysqli_num_rows($link, $result))
            $string .= ' | ';
    }
 
