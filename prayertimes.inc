@@ -111,7 +111,7 @@ class PrayerTimes {
       $ret = PrayerTimes::getTimezoneInfoFromCache($link, $geohash);
       if ($ret != null) return $ret;
       
-      $url = "http://ws.geonames.net/timezoneJSON?lat=$lat&lng=$long";
+      $url = "https://ws.geonames.net/timezoneJSON?lat=$lat&lng=$long";
 
       $url .= "&username=" . USERNAME;
       $ch = curl_init();
