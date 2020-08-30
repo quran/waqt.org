@@ -24,7 +24,7 @@ function buildToolbar(){
 
    $i = 0;
    $string = '';
-   while ($toolbarItem = mysqli_fetch_assoc($link, $result)){
+   while ($toolbarItem = mysqli_fetch_assoc($result)){
       $i++;
       $reps = array('http://');
       if (strpos($_SERVER['SERVER_NAME'], 'www.')===false)
@@ -40,7 +40,7 @@ function buildToolbar(){
           $string .= '>'.$toolbarItem['itemLabel'].'</a>';
       }
 
-      if ($i < mysqli_num_rows($link, $result))
+      if ($i < mysqli_num_rows($result))
            $string .= ' | ';
    }
 
