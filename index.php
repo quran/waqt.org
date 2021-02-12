@@ -53,8 +53,9 @@ function showSalatTimes($location, $pt, $format, $method, $ajax = true){
    global $q;  // don't like this, but...
 
    $data = array();
-   $times = array(0 => "Fajr", 1 => "Shurooq", 2 => "Dhuhr",
-                  3 => "'Asr", 4 => "Maghrib", 5 => "'Isha");
+   $times = array(0 => "Fajr", 1 => "Sunrise", 2 => "Dhuhr",
+                  3 => "'Asr", 4 => "Maghrib", 5 => "'Isha",
+                  7 => "Qiyam" == 12:30 'am');
    foreach ($times as $key => $val){
       $min = $pt[$key]['minute'];
       $hour = $pt[$key]['hour'];
