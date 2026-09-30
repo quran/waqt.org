@@ -16,19 +16,16 @@ dependencies:
 requirements:
 - setup and install libitl, which can be found at arabeyes.org or on sourceforge https://sourceforge.net/projects/arabeyes/files/ITL.
 - setup and install the php extension (phpize, configure, make, make install).
-- make a settings.inc file.  the contents of this file should be:
-
-  <?php
-  $gaCode = ''; // put your google analytics code here
-
-  define('GA_CODE', $gaCode);
-  define('USERNAME', 'geonames_username');
-
-  * note - the username parameter was added to geonames to prevent abuse
-    of their webservice.  you can make one for free on the geonames site,
-    or comment out the json part of prayertimes.inc and uncomment the xml
-    part.  for more information, please see:
-    http://geonames.wordpress.com/2010/03/16/ddos-part-ii/
+- supply a nonempty `WAQT_SQL_PASSWORD` to the PHP process from your runtime
+  secret manager. the committed `settings.inc` reads it from the environment
+  and rejects missing or empty values. prayer queries and the toolbar share
+  this setting; no database password belongs in source or the built image.
+  with PHP-FPM, explicitly pass this variable through the pool's environment
+  configuration, since FPM commonly clears inherited environment variables.
+- configure your Google Analytics code and GeoNames username in `settings.inc`.
+  the GeoNames username is required to prevent abuse of their webservice;
+  register your own account rather than relying on the bundled username.
+  see http://geonames.wordpress.com/2010/03/16/ddos-part-ii/.
 
 - for apache, you need to use the .htaccess file for cleaner links
 - for lighttpd, something like this under the host should work:

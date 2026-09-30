@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../settings.inc';
 function buildToolbar(){
    $toolbar_key = 'quranicaudio.com.toolbar';
    
@@ -12,7 +13,7 @@ function buildToolbar(){
 
    $host = "waqt-db";
    $username = "waqt";
-   $password = "qurtubi786";
+   $password = WAQT_SQL_PASSWORD;
    $database = "waqt";
 
    $link = mysqli_connect($host, $username, $password);
